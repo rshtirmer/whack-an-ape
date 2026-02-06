@@ -1,5 +1,4 @@
 // Play.fun SDK Integration
-// Matching the React usePlayFun hook pattern
 
 const GAME_ID = '042863d6-9ca0-4f98-b1b2-fab4745bb698';
 
@@ -21,20 +20,21 @@ class PlayFunManagerClass {
     }
 
     try {
-      // Create SDK with gameId and widget - matching React hook pattern
+      // Create SDK with widget config
       this.sdk = new window.PlayFunSDK({
-        gameId: GAME_ID,
         ui: {
           usePointsWidget: true,
         },
       });
 
-      await this.sdk.init();
+      // Init with gameId
+      await this.sdk.init({ gameId: GAME_ID });
+      
       this.ready = true;
       
       // Listen for points sync
       this.sdk.on('pointsSynced', (total) => {
-        console.log('[PlayFun] Points synced, total:', total);
+        console.log('[PlayFun] Points synced:', total);
         this.points = total;
       });
 
