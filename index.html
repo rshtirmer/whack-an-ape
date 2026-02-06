@@ -12,22 +12,22 @@
   <meta name="x-ogp-key" content="ef96c446-e22e-4626-bd70-833112de9d5a" id="ogp-key-meta" />
   <script src="https://sdk.play.fun/"></script>
   <script>
-    // Initialize Play.fun SDK globally
+    // Initialize Play.fun SDK globally using OpenGameSDK
     window.playFunSDK = null;
     window.playFunReady = false;
     
-    if (typeof PlayFunSDK !== 'undefined') {
-      window.playFunSDK = new PlayFunSDK({
+    if (typeof OpenGameSDK !== 'undefined') {
+      window.playFunSDK = new OpenGameSDK({
         ui: { usePointsWidget: true }
       });
       window.playFunSDK.init({ gameId: '042863d6-9ca0-4f98-b1b2-fab4745bb698' })
         .then(() => {
           window.playFunReady = true;
-          console.log('[PlayFun] SDK initialized!');
+          console.log('🚀 OpenGameSDK initialized!');
         })
         .catch(err => console.error('[PlayFun] Init error:', err));
     } else {
-      console.warn('[PlayFun] SDK script not loaded');
+      console.warn('[PlayFun] OpenGameSDK not found');
     }
   </script>
   <style>

@@ -1,5 +1,5 @@
 // Play.fun SDK Integration
-// Uses global SDK initialized in index.html
+// Uses global OpenGameSDK initialized in index.html
 
 class PlayFunManagerClass {
   constructor() {
@@ -15,24 +15,25 @@ class PlayFunManagerClass {
   }
 
   /**
-   * Initialize - just wait for global SDK
+   * Initialize - wait for global SDK
    */
   async init() {
-    // SDK is initialized in index.html
-    if (this.sdk && this.ready) {
-      console.log('[PlayFun] Using global SDK');
-      return true;
-    }
-    
-    // Wait a bit for SDK to init
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    if (this.sdk && this.ready) {
+    // SDK initialized in index.html
+    if (this.ready) {
       console.log('[PlayFun] SDK ready');
       return true;
     }
     
-    console.warn('[PlayFun] SDK not ready');
+    // Wait for SDK to init
+    for (let i = 0; i < 10; i++) {
+      await new Promise(r => setTimeout(r, 200));
+      if (this.ready) {
+        console.log('[PlayFun] SDK ready');
+        return true;
+      }
+    }
+    
+    console.warn('[PlayFun] SDK timeout');
     return false;
   }
 
@@ -40,33 +41,30 @@ class PlayFunManagerClass {
    * Add points
    */
   addPoints(amount) {
-    if (this.sdk && this.ready) {
+    if (this.sdk) {
       this.sdk.addPoints(amount);
       this.points += amount;
-      console.log(`[PlayFun] +${amount} points`);
+      console.log(`[PlayFun] +${amount} pts`);
     }
   }
 
   /**
-   * Save points to server
+   * Save points
    */
   async savePoints() {
-    if (this.sdk && this.ready) {
+    if (this.sdk) {
       try {
-        await this.sdk.savePoints();
-        console.log('[PlayFun] Points saved!');
+        await this.sdk.savePoints(this.points);
+        console.log('[PlayFun] Saved:', this.points);
         return true;
-      } catch (error) {
-        console.error('[PlayFun] Save failed:', error);
+      } catch (e) {
+        console.error('[PlayFun] Save failed:', e);
         return false;
       }
     }
     return false;
   }
 
-  /**
-   * Reset for new game
-   */
   resetSession() {
     this.points = 0;
   }
