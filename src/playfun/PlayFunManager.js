@@ -1,49 +1,39 @@
 // Play.fun SDK Integration
-
-const GAME_ID = '042863d6-9ca0-4f98-b1b2-fab4745bb698';
+// Uses global SDK initialized in index.html
 
 class PlayFunManagerClass {
   constructor() {
-    this.sdk = null;
-    this.ready = false;
     this.points = 0;
   }
 
+  get sdk() {
+    return window.playFunSDK;
+  }
+
+  get ready() {
+    return window.playFunReady;
+  }
+
   /**
-   * Initialize the Play.fun SDK
+   * Initialize - just wait for global SDK
    */
   async init() {
-    // Check if PlayFunSDK is available
-    if (typeof window.PlayFunSDK === 'undefined') {
-      console.warn('[PlayFun] PlayFunSDK not loaded');
-      return false;
-    }
-
-    try {
-      // Create SDK with widget config
-      this.sdk = new window.PlayFunSDK({
-        ui: {
-          usePointsWidget: true,
-        },
-      });
-
-      // Init with gameId
-      await this.sdk.init({ gameId: GAME_ID });
-      
-      this.ready = true;
-      
-      // Listen for points sync
-      this.sdk.on('pointsSynced', (total) => {
-        console.log('[PlayFun] Points synced:', total);
-        this.points = total;
-      });
-
-      console.log('[PlayFun] SDK ready!');
+    // SDK is initialized in index.html
+    if (this.sdk && this.ready) {
+      console.log('[PlayFun] Using global SDK');
       return true;
-    } catch (error) {
-      console.error('[PlayFun] Init failed:', error);
-      return false;
     }
+    
+    // Wait a bit for SDK to init
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    if (this.sdk && this.ready) {
+      console.log('[PlayFun] SDK ready');
+      return true;
+    }
+    
+    console.warn('[PlayFun] SDK not ready');
+    return false;
   }
 
   /**
