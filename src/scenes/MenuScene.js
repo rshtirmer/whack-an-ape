@@ -3,9 +3,7 @@ import Phaser from 'phaser';
 import { GAME, COLORS, JUICE } from '../core/Constants.js';
 import { eventBus, Events } from '../core/EventBus.js';
 import { gameState } from '../core/GameState.js';
-import { renderPixelArt } from '../core/PixelRenderer.js';
-import { APE_NORMAL } from '../sprites/ape.js';
-import { APE_PALETTE } from '../sprites/palette.js';
+// Using loaded ape image assets
 
 export class MenuScene extends Phaser.Scene {
   constructor() {
@@ -170,15 +168,14 @@ export class MenuScene extends Phaser.Scene {
   }
 
   createPreviewApe(x, y) {
-    renderPixelArt(this, APE_NORMAL, APE_PALETTE, 'menu-ape', 4);
+    // Use loaded BAYC ape image
+    const ape = this.add.sprite(x, y, 'ape-normal-img');
+    ape.setScale(0); // Start at 0 for pop-in animation
     
-    const ape = this.add.sprite(x, y, 'menu-ape');
-    
-    ape.setScale(0);
     this.tweens.add({
       targets: ape,
-      scaleX: 1,
-      scaleY: 1,
+      scaleX: 0.28,
+      scaleY: 0.28,
       duration: 400,
       ease: 'Back.easeOut',
       delay: 200,
