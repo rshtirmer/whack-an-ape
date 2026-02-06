@@ -6,7 +6,13 @@ export class BootScene extends Phaser.Scene {
     super('BootScene');
   }
 
-  async create() {
+  preload() {
+    // Load ape sprite assets
+    this.load.image('ape-normal-img', '/assets/ape-normal.jpg');
+    this.load.image('ape-golden-img', '/assets/ape-golden.jpg');
+  }
+
+  create() {
     // Initialize Play.fun SDK (non-blocking)
     PlayFunManager.init().then((success) => {
       if (success) {
@@ -18,7 +24,7 @@ export class BootScene extends Phaser.Scene {
       console.warn('[Boot] Play.fun SDK init failed:', err);
     });
 
-    // Continue to menu immediately (don't wait for SDK)
+    // Continue to menu
     this.scene.start('MenuScene');
   }
 }

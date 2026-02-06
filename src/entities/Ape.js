@@ -1,10 +1,7 @@
-// Whack an Ape - Ape Entity (Pixel Art Version)
+// Whack an Ape - Ape Entity (Image-based sprites)
 import Phaser from 'phaser';
 import { APE, GRID } from '../core/Constants.js';
 import { eventBus, Events } from '../core/EventBus.js';
-import { renderPixelArt } from '../core/PixelRenderer.js';
-import { APE_NORMAL, APE_WHACKED } from '../sprites/ape.js';
-import { APE_PALETTE, GOLDEN_APE_PALETTE } from '../sprites/palette.js';
 
 export class Ape {
   constructor(scene, holeIndex, isGolden = false) {
@@ -20,22 +17,17 @@ export class Ape {
     this.x = GRID.OFFSET_X + col * GRID.HOLE_SPACING_X;
     this.y = GRID.OFFSET_Y + row * GRID.HOLE_SPACING_Y;
     
-    // Generate pixel art textures if not already done
-    const palette = isGolden ? GOLDEN_APE_PALETTE : APE_PALETTE;
-    const texKey = isGolden ? 'ape-golden' : 'ape-normal';
-    const whackedKey = isGolden ? 'ape-golden-whacked' : 'ape-whacked';
+    // Use loaded image textures
+    const texKey = isGolden ? 'ape-golden-img' : 'ape-normal-img';
     
-    renderPixelArt(scene, APE_NORMAL, palette, texKey, 2.5);
-    renderPixelArt(scene, APE_WHACKED, palette, whackedKey, 2.5);
-    
-    // Create sprite
+    // Create sprite - scale down from 500x500 to fit holes (~80px)
     this.sprite = scene.add.sprite(this.x, this.y + 60, texKey);
+    this.sprite.setScale(0.16); // 500 * 0.16 = 80px
     this.sprite.setDepth(10);
     this.sprite.setInteractive({ useHandCursor: true });
     
-    // Store references for later
+    // Store texture key
     this.texKey = texKey;
-    this.whackedKey = whackedKey;
     
     // Click/tap handler
     this.sprite.on('pointerdown', () => this.onWhack());
@@ -46,7 +38,7 @@ export class Ape {
     }
     
     // Start hidden, then pop up
-    this.sprite.setScale(1, 0);
+    this.sprite.setScale(0.16, 0);
     this.popUp();
   }
 
@@ -65,7 +57,7 @@ export class Ape {
         this.x + pos.x, 
         this.y + pos.y, 
         4, 4, 8, 
-        0xffffff
+        0xffd700
       );
       sparkle.setDepth(11);
       this.sparkles.push(sparkle);
@@ -87,7 +79,7 @@ export class Ape {
   popUp() {
     this.scene.tweens.add({
       targets: this.sprite,
-      scaleY: 1,
+      scaleY: 0.16,
       y: this.y - 10,
       duration: APE.POP_UP_DURATION,
       ease: 'Back.easeOut',
@@ -166,9 +158,6 @@ export class Ape {
     if (this.isWhacked || this.isHiding) return;
     this.isWhacked = true;
     
-    // Swap to whacked texture (dazed expression)
-    this.sprite.setTexture(this.whackedKey);
-    
     // Emit whacked event
     eventBus.emit(Events.APE_WHACKED, {
       holeIndex: this.holeIndex,
@@ -180,8 +169,8 @@ export class Ape {
     // Visual feedback - squash and flash
     this.scene.tweens.add({
       targets: this.sprite,
-      scaleX: 1.3,
-      scaleY: 0.6,
+      scaleX: 0.2,
+      scaleY: 0.1,
       duration: 80,
       yoyo: true,
       onComplete: () => {
@@ -189,9 +178,9 @@ export class Ape {
       },
     });
     
-    // Flash white
-    this.sprite.setTintFill(0xffffff);
-    this.scene.time.delayedCall(50, () => {
+    // Flash/tint effect
+    this.sprite.setTint(0xff6666);
+    this.scene.time.delayedCall(80, () => {
       if (this.sprite && this.sprite.active) {
         this.sprite.clearTint();
       }
