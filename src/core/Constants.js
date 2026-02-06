@@ -1,22 +1,26 @@
 // Whack an Ape - Constants
 
-// Detect mobile device
-const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
-  || (window.innerWidth <= 768);
+// Detect orientation at runtime: portrait = mobile layout, landscape = desktop layout
+function isPortrait() {
+  if (typeof window === 'undefined') return false;
+  return window.innerHeight > window.innerWidth;
+}
 
-// Responsive dimensions
+const portrait = isPortrait();
+console.log('[Game] Portrait mode:', portrait, '| Screen:', window?.innerWidth, 'x', window?.innerHeight);
+
+// Responsive dimensions based on actual screen orientation
 export const GAME = {
-  // Desktop: Landscape (1280x720), Mobile: Portrait (720x1280)
-  WIDTH: isMobile ? 720 : 1280,
-  HEIGHT: isMobile ? 1280 : 720,
-  IS_MOBILE: isMobile,
+  WIDTH: portrait ? 720 : 1280,
+  HEIGHT: portrait ? 1280 : 720,
+  IS_MOBILE: portrait,
   GRAVITY: 0,
   GAME_DURATION: 30,
 };
 
 // Grid adjusts based on orientation
-export const GRID = isMobile ? {
-  // Portrait (mobile): 3x3 vertical layout
+export const GRID = portrait ? {
+  // Portrait: 3x3 vertical layout
   COLS: 3,
   ROWS: 3,
   HOLE_SIZE: 120,
@@ -25,14 +29,14 @@ export const GRID = isMobile ? {
   OFFSET_X: 140,
   OFFSET_Y: 480,
 } : {
-  // Landscape (desktop): 3x3 horizontal layout
+  // Landscape: 3x3 horizontal layout
   COLS: 3,
   ROWS: 3,
   HOLE_SIZE: 120,
   HOLE_SPACING_X: 280,
   HOLE_SPACING_Y: 180,
-  OFFSET_X: 360,  // Center horizontally in 1280
-  OFFSET_Y: 280,  // Center vertically in 720
+  OFFSET_X: 360,
+  OFFSET_Y: 280,
 };
 
 export const APE = {
