@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#2d5a27" />
+  <title>Whack an Ape</title>
+  <!-- Play.fun SDK for monetization -->
+  <meta name="x-ogp-key" content="ef96c446-e22e-4626-bd70-833112de9d5a" id="ogp-key-meta" />
+  <!-- Play.fun SDK loaded in body -->
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+      width: 100%; 
+      height: 100%; 
+      overflow: hidden;
+      background: #1a3a17;
+      touch-action: none;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    #game-container { 
+      width: 100%;
+      height: 100%;
+    }
+    #game-container canvas {
+      display: block;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+  </style>
+  <script type="module" crossorigin src="/whack-an-ape/assets/index-C2JEwkvE.js"></script>
+</head>
+<body>
+  <div id="game-container"></div>
+  
+  <!-- Play.fun SDK - must be after DOM ready -->
+  <script src="https://sdk.play.fun/"></script>
+  <script>
+    window.playFunSDK = null;
+    window.playFunReady = false;
+    
+    if (typeof OpenGameSDK !== 'undefined') {
+      window.playFunSDK = new OpenGameSDK({
+        ui: { usePointsWidget: true }
+      });
+      window.playFunSDK.init({ gameId: '042863d6-9ca0-4f98-b1b2-fab4745bb698' })
+        .then(() => {
+          window.playFunReady = true;
+          console.log('🚀 OpenGameSDK initialized!');
+        })
+        .catch(err => console.error('[PlayFun] Init error:', err));
+    }
+  </script>
+  
+</body>
+</html>
