@@ -3,6 +3,7 @@ import Phaser from 'phaser';
 import { GAME, COLORS, JUICE } from '../core/Constants.js';
 import { eventBus, Events } from '../core/EventBus.js';
 import { gameState } from '../core/GameState.js';
+import { PlayFunManager } from '../playfun/PlayFunManager.js';
 
 export class GameOverScene extends Phaser.Scene {
   constructor() {
@@ -48,6 +49,13 @@ export class GameOverScene extends Phaser.Scene {
     this.cameras.main.fadeIn(400, 0, 0, 0);
 
     eventBus.emit(Events.MUSIC_GAMEOVER);
+    
+    // Save points to Play.fun
+    PlayFunManager.savePoints().then((saved) => {
+      if (saved) {
+        console.log('[GameOver] Points saved to Play.fun!');
+      }
+    });
   }
 
   createBackground() {

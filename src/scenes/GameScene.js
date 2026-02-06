@@ -9,6 +9,7 @@ import { ENVIRONMENT_PALETTE } from '../sprites/palette.js';
 import { Hole } from '../entities/Hole.js';
 import { Ape } from '../entities/Ape.js';
 import { Hammer } from '../entities/Hammer.js';
+import { PlayFunManager } from '../playfun/PlayFunManager.js';
 
 export class GameScene extends Phaser.Scene {
   constructor() {
@@ -17,6 +18,9 @@ export class GameScene extends Phaser.Scene {
 
   create() {
     gameState.reset();
+    
+    // Reset Play.fun session for new game
+    PlayFunManager.resetSession();
     
     // Background
     this.createBackground();
@@ -131,6 +135,9 @@ export class GameScene extends Phaser.Scene {
       const actualPoints = gameState.addScore(points);
       gameState.incrementCombo();
       gameState.recordWhack(isGolden);
+      
+      // Track points with Play.fun
+      PlayFunManager.addPoints(actualPoints);
       
       eventBus.emit(Events.SCORE_CHANGED, { 
         score: gameState.score, 
