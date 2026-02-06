@@ -1,5 +1,5 @@
 // Play.fun SDK Integration
-// Based on @playdotfun/game-sdk
+// Matching the React usePlayFun hook pattern
 
 const GAME_ID = '042863d6-9ca0-4f98-b1b2-fab4745bb698';
 
@@ -14,33 +14,34 @@ class PlayFunManagerClass {
    * Initialize the Play.fun SDK
    */
   async init() {
-    // Check if SDK is available (OpenGameSDK from sdk.play.fun)
-    if (typeof window.OpenGameSDK === 'undefined') {
-      console.warn('[PlayFun] OpenGameSDK not loaded');
+    // Check if PlayFunSDK is available
+    if (typeof window.PlayFunSDK === 'undefined') {
+      console.warn('[PlayFun] PlayFunSDK not loaded');
       return false;
     }
 
     try {
-      // Create SDK instance with widget enabled
-      this.sdk = new window.OpenGameSDK({
+      // Create SDK with gameId and widget - matching React hook pattern
+      this.sdk = new window.PlayFunSDK({
+        gameId: GAME_ID,
         ui: {
           usePointsWidget: true,
         },
       });
 
-      // Set up ready event before init
-      this.sdk.on('OnReady', () => {
-        console.log('[PlayFun] SDK ready!');
-        this.ready = true;
+      await this.sdk.init();
+      this.ready = true;
+      
+      // Listen for points sync
+      this.sdk.on('pointsSynced', (total) => {
+        console.log('[PlayFun] Points synced, total:', total);
+        this.points = total;
       });
 
-      // Initialize with game ID
-      await this.sdk.init({ gameId: GAME_ID });
-      
-      console.log('[PlayFun] SDK initialized');
+      console.log('[PlayFun] SDK ready!');
       return true;
     } catch (error) {
-      console.error('[PlayFun] Failed to initialize:', error);
+      console.error('[PlayFun] Init failed:', error);
       return false;
     }
   }
@@ -49,35 +50,32 @@ class PlayFunManagerClass {
    * Add points
    */
   addPoints(amount) {
-    this.points += amount;
-    
-    if (this.sdk) {
+    if (this.sdk && this.ready) {
       this.sdk.addPoints(amount);
-      console.log(`[PlayFun] +${amount} points (total: ${this.points})`);
+      this.points += amount;
+      console.log(`[PlayFun] +${amount} points`);
     }
   }
 
   /**
-   * Save points to Play.fun server
+   * Save points to server
    */
   async savePoints() {
-    if (!this.sdk) {
-      console.log('[PlayFun] SDK not available');
-      return false;
+    if (this.sdk && this.ready) {
+      try {
+        await this.sdk.savePoints();
+        console.log('[PlayFun] Points saved!');
+        return true;
+      } catch (error) {
+        console.error('[PlayFun] Save failed:', error);
+        return false;
+      }
     }
-
-    try {
-      await this.sdk.savePoints(this.points);
-      console.log(`[PlayFun] Saved ${this.points} points`);
-      return true;
-    } catch (error) {
-      console.error('[PlayFun] Save failed:', error);
-      return false;
-    }
+    return false;
   }
 
   /**
-   * Reset points for new game
+   * Reset for new game
    */
   resetSession() {
     this.points = 0;
