@@ -1,4 +1,4 @@
-// Whack an Ape - UI Scene (Portrait Mobile)
+// Whack an Ape - UI Scene (Responsive)
 import Phaser from 'phaser';
 import { GAME, COLORS, TRANSITION, JUICE } from '../core/Constants.js';
 import { eventBus, Events } from '../core/EventBus.js';
@@ -10,8 +10,12 @@ export class UIScene extends Phaser.Scene {
   }
 
   create() {
+    // Responsive Y positions
+    const topY = GAME.IS_MOBILE ? 160 : 50;
+    const comboY = GAME.IS_MOBILE ? 230 : 100;
+
     // Score panel (top left)
-    this.scorePanel = this.add.container(30, 160);
+    this.scorePanel = this.add.container(30, topY);
     
     const scoreBg = this.add.rectangle(100, 0, 200, 50, 0x000000, 0.5);
     scoreBg.setStrokeStyle(2, 0xffd700);
@@ -25,7 +29,7 @@ export class UIScene extends Phaser.Scene {
     this.scorePanel.add([scoreBg, this.scoreText]);
 
     // Timer panel (top right)
-    this.timerPanel = this.add.container(GAME.WIDTH - 30, 160);
+    this.timerPanel = this.add.container(GAME.WIDTH - 30, topY);
     
     const timerBg = this.add.rectangle(-100, 0, 180, 50, 0x000000, 0.5);
     timerBg.setStrokeStyle(2, 0x44aaff);
@@ -40,7 +44,7 @@ export class UIScene extends Phaser.Scene {
     this.timerBg = timerBg;
 
     // Combo display (center)
-    this.comboContainer = this.add.container(GAME.WIDTH / 2, 230);
+    this.comboContainer = this.add.container(GAME.WIDTH / 2, comboY);
     
     this.comboText = this.add.text(0, 0, '', {
       fontSize: '32px',
@@ -52,9 +56,9 @@ export class UIScene extends Phaser.Scene {
     this.comboText.setAlpha(0);
     
     this.comboContainer.add(this.comboText);
+    this.comboY = comboY;
 
     this.setupEventListeners();
-
     eventBus.emit(Events.MUSIC_GAMEPLAY);
   }
 
@@ -205,7 +209,7 @@ export class UIScene extends Phaser.Scene {
 
   emitComboParticles() {
     const cx = GAME.WIDTH / 2;
-    const cy = 230;
+    const cy = this.comboY;
     
     for (let i = 0; i < 8; i++) {
       const angle = (Math.PI * 2 * i) / 8;

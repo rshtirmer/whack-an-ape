@@ -1,19 +1,38 @@
 // Whack an Ape - Constants
+
+// Detect mobile device
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+  || (window.innerWidth <= 768);
+
+// Responsive dimensions
 export const GAME = {
-  WIDTH: 720,
-  HEIGHT: 1280,  // Portrait orientation for mobile-first
+  // Desktop: Landscape (1280x720), Mobile: Portrait (720x1280)
+  WIDTH: isMobile ? 720 : 1280,
+  HEIGHT: isMobile ? 1280 : 720,
+  IS_MOBILE: isMobile,
   GRAVITY: 0,
   GAME_DURATION: 30,
 };
 
-export const GRID = {
+// Grid adjusts based on orientation
+export const GRID = isMobile ? {
+  // Portrait (mobile): 3x3 vertical layout
   COLS: 3,
   ROWS: 3,
   HOLE_SIZE: 120,
   HOLE_SPACING_X: 220,
   HOLE_SPACING_Y: 220,
-  OFFSET_X: 140,  // (720 - 2*220) / 2 = 140, centers 3 columns
+  OFFSET_X: 140,
   OFFSET_Y: 480,
+} : {
+  // Landscape (desktop): 3x3 horizontal layout
+  COLS: 3,
+  ROWS: 3,
+  HOLE_SIZE: 120,
+  HOLE_SPACING_X: 280,
+  HOLE_SPACING_Y: 180,
+  OFFSET_X: 360,  // Center horizontally in 1280
+  OFFSET_Y: 280,  // Center vertically in 720
 };
 
 export const APE = {

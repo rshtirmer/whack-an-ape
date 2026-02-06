@@ -1,4 +1,4 @@
-// Whack an Ape - Game Scene (Portrait Mobile)
+// Whack an Ape - Game Scene (Responsive)
 import Phaser from 'phaser';
 import { GAME, GRID, APE, COLORS } from '../core/Constants.js';
 import { eventBus, Events } from '../core/EventBus.js';
@@ -68,15 +68,18 @@ export class GameScene extends Phaser.Scene {
     renderPixelArt(this, GRASS_TILE, ENVIRONMENT_PALETTE, 'grass-tile', 3);
     renderPixelArt(this, GRASS_FLOWERS, ENVIRONMENT_PALETTE, 'grass-flowers', 3);
     
+    // Responsive sky height
+    const skyHeight = GAME.IS_MOBILE ? GAME.HEIGHT * 0.25 : GAME.HEIGHT * 0.35;
+    
     // Sky gradient (top portion)
     const skyGradient = this.add.graphics();
     skyGradient.fillGradientStyle(0x87ceeb, 0x87ceeb, 0x4a9edb, 0x4a9edb);
-    skyGradient.fillRect(0, 0, GAME.WIDTH, GAME.HEIGHT * 0.25);
+    skyGradient.fillRect(0, 0, GAME.WIDTH, skyHeight);
     skyGradient.setDepth(-20);
     
     // Grass background with tiled pixel art
     const tileSize = 48;
-    for (let y = GAME.HEIGHT * 0.25; y < GAME.HEIGHT; y += tileSize) {
+    for (let y = skyHeight; y < GAME.HEIGHT; y += tileSize) {
       for (let x = 0; x < GAME.WIDTH; x += tileSize) {
         const variant = Math.random() < 0.7 ? 'grass-tile' : 'grass-flowers';
         const tile = this.add.sprite(x + tileSize / 2, y + tileSize / 2, variant);
@@ -84,26 +87,35 @@ export class GameScene extends Phaser.Scene {
       }
     }
     
-    // Title banner at top
-    const bannerBg = this.add.rectangle(GAME.WIDTH / 2, 80, 400, 70, 0x8b4513);
-    bannerBg.setStrokeStyle(4, 0x654321);
-    bannerBg.setDepth(100);
-    
-    const bannerText = this.add.text(GAME.WIDTH / 2, 80, '🦧 WHACK AN APE 🔨', {
-      fontSize: '32px',
-      fontFamily: 'Impact, monospace',
-      color: '#ffd700',
-    }).setOrigin(0.5).setDepth(101);
+    // Title banner - hide on desktop (landscape has less vertical space)
+    if (GAME.IS_MOBILE) {
+      const bannerBg = this.add.rectangle(GAME.WIDTH / 2, 80, 400, 70, 0x8b4513);
+      bannerBg.setStrokeStyle(4, 0x654321);
+      bannerBg.setDepth(100);
+      
+      const bannerText = this.add.text(GAME.WIDTH / 2, 80, '🦧 WHACK AN APE 🔨', {
+        fontSize: '32px',
+        fontFamily: 'Impact, monospace',
+        color: '#ffd700',
+      }).setOrigin(0.5).setDepth(101);
+    }
     
     // Decorative clouds
     this.addClouds();
   }
 
   addClouds() {
-    const cloudPositions = [
+    // Responsive cloud positions
+    const cloudPositions = GAME.IS_MOBILE ? [
       { x: 80, y: 60, scale: 0.7 },
       { x: 640, y: 80, scale: 0.9 },
       { x: 360, y: 50, scale: 0.5 },
+    ] : [
+      { x: 100, y: 60, scale: 0.8 },
+      { x: 400, y: 40, scale: 0.6 },
+      { x: 700, y: 70, scale: 0.9 },
+      { x: 1000, y: 50, scale: 0.7 },
+      { x: 1180, y: 65, scale: 0.5 },
     ];
     
     cloudPositions.forEach(pos => {
