@@ -3,8 +3,8 @@
 
 // Configuration - UPDATE THIS after registering on https://app.play.fun
 const PLAYFUN_CONFIG = {
-  // TODO: Replace with your actual game ID from Play.fun dashboard
-  gameId: 'YOUR_GAME_ID_HERE',
+  // Registered on Play.fun 2026-02-06
+  gameId: '042863d6-9ca0-4f98-b1b2-fab4745bb698',
   
   // Widget settings
   ui: {
@@ -26,9 +26,8 @@ class PlayFunManagerClass {
    */
   async init() {
     // Skip if no valid game ID configured
-    if (PLAYFUN_CONFIG.gameId === 'YOUR_GAME_ID_HERE') {
-      console.warn('[PlayFun] No game ID configured. Set gameId in PlayFunManager.js');
-      console.warn('[PlayFun] Register your game at https://app.play.fun to get a game ID');
+    if (!PLAYFUN_CONFIG.gameId || PLAYFUN_CONFIG.gameId === 'YOUR_GAME_ID_HERE') {
+      console.warn('[PlayFun] No game ID configured');
       return false;
     }
 
