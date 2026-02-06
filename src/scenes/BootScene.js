@@ -9,8 +9,8 @@ export class BootScene extends Phaser.Scene {
   preload() {
     // Load ape sprite assets (use base path for GitHub Pages compatibility)
     const base = import.meta.env.BASE_URL || '/';
-    this.load.image('ape-normal-img', `${base}assets/ape-normal.jpg`);
-    this.load.image('ape-golden-img', `${base}assets/ape-golden.jpg`);
+    this.load.image('ape-normal-img', `${base}assets/ape-normal.png`);
+    this.load.image('ape-golden-img', `${base}assets/ape-golden.png`);
   }
 
   create() {
