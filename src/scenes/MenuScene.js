@@ -1,9 +1,8 @@
-// Whack an Ape - Menu Scene (Portrait Mobile)
+// Whack an Ape - Menu Scene (Polished)
 import Phaser from 'phaser';
 import { GAME, COLORS, JUICE } from '../core/Constants.js';
 import { eventBus, Events } from '../core/EventBus.js';
 import { gameState } from '../core/GameState.js';
-// Using loaded ape image assets
 
 export class MenuScene extends Phaser.Scene {
   constructor() {
@@ -14,190 +13,182 @@ export class MenuScene extends Phaser.Scene {
     const cx = GAME.WIDTH / 2;
     const cy = GAME.HEIGHT / 2;
 
-    // Animated background
-    this.createAnimatedBackground();
+    this.createBackground();
+    this.createTitle(cx, 180);
+    this.createPreviewApe(cx, cy - 60);
+    this.createBestScore(cx, cy + 140);
+    this.createPlayButton(cx, cy + 260);
+    this.createInstructions(cx, cy + 400);
 
-    // Title
-    this.createTitle(cx, cy - 280);
-
-    // Subtitle
-    const subtitle = this.add.text(cx, cy - 180, '🦧 Bored Ape Yacht Club Edition 🦧', {
-      fontSize: '18px',
-      fontFamily: 'monospace',
-      color: '#aaaaaa',
-      fontStyle: 'italic',
-    }).setOrigin(0.5);
-    
-    subtitle.setAlpha(0);
-    this.tweens.add({
-      targets: subtitle,
-      alpha: 1,
-      duration: 800,
-      delay: 400,
-    });
-
-    // Preview ape
-    this.createPreviewApe(cx, cy);
-
-    // Best score
-    if (gameState.bestScore > 0) {
-      const bestScore = this.add.text(cx, cy + 180, `🏆 Best: ${gameState.bestScore}`, {
-        fontSize: '28px',
-        fontFamily: 'Impact, monospace',
-        color: '#ffd700',
-      }).setOrigin(0.5);
-      
-      bestScore.setAlpha(0);
-      this.tweens.add({
-        targets: bestScore,
-        alpha: 1,
-        duration: 600,
-        delay: 600,
-      });
-    }
-
-    // Play button
-    this.createPlayButton(cx, cy + 280);
-
-    // Instruction
-    const prompt = this.add.text(cx, cy + 380, '🎯 Tap the apes before they escape!', {
-      fontSize: '18px',
-      fontFamily: 'monospace',
-      color: '#888888',
-    }).setOrigin(0.5);
-
-    this.tweens.add({
-      targets: prompt,
-      alpha: 0.5,
-      duration: 1000,
-      yoyo: true,
-      repeat: -1,
-    });
-
-    // Touch instruction for mobile
-    const touchHint = this.add.text(cx, cy + 420, '👆 Tap anywhere to start', {
-      fontSize: '16px',
-      fontFamily: 'monospace',
-      color: '#666666',
-    }).setOrigin(0.5);
-
-    this.tweens.add({
-      targets: touchHint,
-      alpha: 0.3,
-      duration: 800,
-      yoyo: true,
-      repeat: -1,
-      delay: 500,
-    });
-
-    // Keyboard start
+    // Input handlers
     this.input.keyboard.once('keydown-SPACE', () => this.startGame());
-    
-    // Touch anywhere to start (after delay)
     this.time.delayedCall(500, () => {
       this.input.once('pointerdown', () => this.startGame());
     });
 
-    // Fade in
     this.cameras.main.fadeIn(400, 0, 0, 0);
-
     eventBus.emit(Events.MUSIC_MENU);
   }
 
-  createAnimatedBackground() {
+  createBackground() {
+    // Dark gradient base
     const bg = this.add.graphics();
-    bg.fillGradientStyle(0x2d5a27, 0x2d5a27, 0x1a3a17, 0x1a3a17);
+    bg.fillGradientStyle(0x1a472a, 0x1a472a, 0x0d2818, 0x0d2818);
     bg.fillRect(0, 0, GAME.WIDTH, GAME.HEIGHT);
 
-    for (let i = 0; i < 20; i++) {
+    // Radial glow behind ape
+    const glow = this.add.graphics();
+    glow.fillStyle(0x2d5a27, 0.4);
+    glow.fillCircle(GAME.WIDTH / 2, GAME.HEIGHT / 2 - 60, 200);
+    glow.fillStyle(0x3d7a37, 0.2);
+    glow.fillCircle(GAME.WIDTH / 2, GAME.HEIGHT / 2 - 60, 280);
+
+    // Floating particles
+    for (let i = 0; i < 25; i++) {
       const x = Phaser.Math.Between(0, GAME.WIDTH);
       const y = Phaser.Math.Between(0, GAME.HEIGHT);
-      const size = Phaser.Math.Between(2, 5);
-      const particle = this.add.circle(x, y, size, 0xffd700, 0.3);
+      const size = Phaser.Math.Between(2, 4);
+      const particle = this.add.circle(x, y, size, 0xffd700, 0.2);
       
       this.tweens.add({
         targets: particle,
-        y: y - 150,
+        y: y - 200,
         alpha: 0,
-        duration: 4000 + Math.random() * 2000,
+        duration: 5000 + Math.random() * 3000,
         repeat: -1,
-        delay: Math.random() * 2000,
+        delay: Math.random() * 3000,
         onRepeat: () => {
           particle.y = GAME.HEIGHT + 20;
-          particle.alpha = 0.3;
+          particle.alpha = 0.2;
           particle.x = Phaser.Math.Between(0, GAME.WIDTH);
         }
       });
     }
+
+    // Subtle vignette
+    const vignette = this.add.graphics();
+    vignette.fillStyle(0x000000, 0.3);
+    vignette.fillRect(0, 0, GAME.WIDTH, 80);
+    vignette.fillRect(0, GAME.HEIGHT - 80, GAME.WIDTH, 80);
   }
 
   createTitle(x, y) {
-    const shadow = this.add.text(x + 4, y + 4, 'WHACK AN APE', {
-      fontSize: '52px',
-      fontFamily: 'Impact, monospace',
+    // Outer glow effect
+    const glowText = this.add.text(x, y, 'WHACK AN APE', {
+      fontSize: '54px',
+      fontFamily: 'Impact, Arial Black, sans-serif',
+      color: '#ff8c00',
+    }).setOrigin(0.5).setAlpha(0.3).setScale(1.05);
+
+    // Shadow
+    const shadow = this.add.text(x + 3, y + 3, 'WHACK AN APE', {
+      fontSize: '54px',
+      fontFamily: 'Impact, Arial Black, sans-serif',
       color: '#000000',
     }).setOrigin(0.5);
     
+    // Main title
     const title = this.add.text(x, y, 'WHACK AN APE', {
-      fontSize: '52px',
-      fontFamily: 'Impact, monospace',
+      fontSize: '54px',
+      fontFamily: 'Impact, Arial Black, sans-serif',
       color: '#ffd700',
     }).setOrigin(0.5);
 
-    title.setScale(0);
-    shadow.setScale(0);
+    // Hammer icons
+    const hammer1 = this.add.text(x - 220, y, '🔨', { fontSize: '40px' }).setOrigin(0.5);
+    const hammer2 = this.add.text(x + 220, y, '🔨', { fontSize: '40px' }).setOrigin(0.5).setFlipX(true);
+
+    // Animate in
+    [glowText, shadow, title, hammer1, hammer2].forEach(obj => obj.setScale(0));
     
     this.tweens.add({
-      targets: [title, shadow],
+      targets: [glowText, shadow, title],
       scaleX: 1,
       scaleY: 1,
-      duration: 500,
+      duration: 600,
       ease: 'Back.easeOut',
     });
 
     this.tweens.add({
-      targets: title,
-      scaleX: 1.02,
-      scaleY: 1.02,
+      targets: [hammer1, hammer2],
+      scaleX: 1,
+      scaleY: 1,
+      duration: 400,
+      ease: 'Back.easeOut',
+      delay: 300,
+    });
+
+    // Subtle pulse
+    this.tweens.add({
+      targets: [title, glowText],
+      scaleX: 1.03,
+      scaleY: 1.03,
       duration: 2000,
       yoyo: true,
       repeat: -1,
       ease: 'Sine.easeInOut',
-      delay: 500,
+      delay: 800,
+    });
+
+    // Hammer wiggle
+    this.tweens.add({
+      targets: hammer1,
+      angle: -15,
+      duration: 400,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut',
+      delay: 1000,
+    });
+    this.tweens.add({
+      targets: hammer2,
+      angle: 15,
+      duration: 400,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut',
+      delay: 1200,
     });
   }
 
   createPreviewApe(x, y) {
-    // Use loaded BAYC ape image
+    // Platform/pedestal
+    const platform = this.add.ellipse(x, y + 70, 160, 30, 0x1a3a17);
+    platform.setAlpha(0.8);
+
+    // Ape sprite
     const ape = this.add.sprite(x, y, 'ape-normal-img');
-    ape.setScale(0); // Start at 0 for pop-in animation
+    ape.setScale(0);
     
     this.tweens.add({
       targets: ape,
-      scaleX: 0.28,
-      scaleY: 0.28,
-      duration: 400,
+      scaleX: 0.32,
+      scaleY: 0.32,
+      duration: 500,
       ease: 'Back.easeOut',
       delay: 200,
     });
     
+    // Idle bob animation
     this.tweens.add({
       targets: ape,
-      y: y - 20,
-      duration: 1200,
+      y: y - 15,
+      duration: 1500,
       yoyo: true,
       repeat: -1,
       ease: 'Sine.easeInOut',
-      delay: 600,
+      delay: 700,
     });
 
+    // Occasional blink/squish
     this.time.addEvent({
-      delay: 3000,
+      delay: 2500,
       callback: () => {
         this.tweens.add({
           targets: ape,
-          scaleY: 0.9,
-          duration: 80,
+          scaleY: 0.28,
+          scaleX: 0.35,
+          duration: 100,
           yoyo: true,
         });
       },
@@ -205,80 +196,156 @@ export class MenuScene extends Phaser.Scene {
     });
   }
 
+  createBestScore(x, y) {
+    if (gameState.bestScore > 0) {
+      // Trophy container
+      const container = this.add.container(x, y);
+      
+      const bg = this.add.rectangle(0, 0, 220, 50, 0x000000, 0.3);
+      bg.setStrokeStyle(2, 0xffd700, 0.5);
+      
+      const text = this.add.text(0, 0, `🏆 BEST: ${gameState.bestScore}`, {
+        fontSize: '24px',
+        fontFamily: 'Impact, Arial Black, sans-serif',
+        color: '#ffd700',
+      }).setOrigin(0.5);
+      
+      container.add([bg, text]);
+      container.setAlpha(0);
+      container.setScale(0.8);
+      
+      this.tweens.add({
+        targets: container,
+        alpha: 1,
+        scaleX: 1,
+        scaleY: 1,
+        duration: 400,
+        delay: 600,
+        ease: 'Back.easeOut',
+      });
+    }
+  }
+
   createPlayButton(x, y) {
-    const btn = this.add.rectangle(x, y, 320, 80, COLORS.BUTTON);
-    btn.setStrokeStyle(4, 0x654321);
+    // Button glow
+    const btnGlow = this.add.rectangle(x, y, 300, 75, 0xffa500, 0.3);
+    btnGlow.setStrokeStyle(0);
+    
+    // Main button
+    const btn = this.add.rectangle(x, y, 280, 65, 0xd35400);
+    btn.setStrokeStyle(3, 0xffa500);
     btn.setInteractive({ useHandCursor: true });
 
-    const btnText = this.add.text(x, y, '🔨 START WHACKING', {
-      fontSize: '28px',
-      fontFamily: 'Impact, monospace',
+    // Button highlight (top edge)
+    const highlight = this.add.rectangle(x, y - 25, 270, 8, 0xffffff, 0.2);
+
+    const btnText = this.add.text(x, y, 'PLAY', {
+      fontSize: '36px',
+      fontFamily: 'Impact, Arial Black, sans-serif',
       color: '#ffffff',
     }).setOrigin(0.5);
 
-    btn.setScale(0);
-    btnText.setScale(0);
+    // Animate in
+    [btnGlow, btn, highlight, btnText].forEach(obj => obj.setScale(0));
+    
     this.tweens.add({
-      targets: [btn, btnText],
+      targets: [btnGlow, btn, highlight, btnText],
       scaleX: 1,
       scaleY: 1,
       duration: 400,
       ease: 'Back.easeOut',
-      delay: 400,
+      delay: 500,
+    });
+
+    // Pulse glow
+    this.tweens.add({
+      targets: btnGlow,
+      scaleX: 1.1,
+      scaleY: 1.2,
+      alpha: 0.1,
+      duration: 1000,
+      yoyo: true,
+      repeat: -1,
+      delay: 1000,
     });
 
     btn.on('pointerover', () => {
       this.tweens.add({
-        targets: [btn, btnText],
-        scaleX: JUICE.BUTTON_HOVER_SCALE,
-        scaleY: JUICE.BUTTON_HOVER_SCALE,
+        targets: [btn, btnText, highlight],
+        scaleX: 1.08,
+        scaleY: 1.08,
         duration: 100,
-        ease: 'Quad.easeOut',
       });
-      btn.setFillStyle(COLORS.BUTTON_HOVER);
+      btn.setFillStyle(0xe67e22);
     });
 
     btn.on('pointerout', () => {
       this.tweens.add({
-        targets: [btn, btnText],
+        targets: [btn, btnText, highlight],
         scaleX: 1,
         scaleY: 1,
         duration: 100,
       });
-      btn.setFillStyle(COLORS.BUTTON);
+      btn.setFillStyle(0xd35400);
     });
 
     btn.on('pointerdown', () => {
       this.tweens.add({
-        targets: [btn, btnText],
-        scaleX: JUICE.BUTTON_PRESS_SCALE,
-        scaleY: JUICE.BUTTON_PRESS_SCALE,
+        targets: [btn, btnText, highlight],
+        scaleX: 0.95,
+        scaleY: 0.95,
         duration: 50,
       });
     });
 
-    btn.on('pointerup', () => {
-      this.startGame();
+    btn.on('pointerup', () => this.startGame());
+  }
+
+  createInstructions(x, y) {
+    const instruction = this.add.text(x, y, 'Tap the apes before they escape!', {
+      fontSize: '18px',
+      fontFamily: 'Arial, sans-serif',
+      color: '#88aa88',
+    }).setOrigin(0.5);
+    
+    instruction.setAlpha(0);
+    this.tweens.add({
+      targets: instruction,
+      alpha: 0.8,
+      duration: 600,
+      delay: 800,
+    });
+
+    const hint = this.add.text(x, y + 40, '— tap anywhere to start —', {
+      fontSize: '14px',
+      fontFamily: 'Arial, sans-serif',
+      color: '#668866',
+      fontStyle: 'italic',
+    }).setOrigin(0.5);
+    
+    hint.setAlpha(0);
+    this.tweens.add({
+      targets: hint,
+      alpha: 0.6,
+      duration: 600,
+      delay: 1000,
     });
 
     this.tweens.add({
-      targets: btn,
-      scaleX: 1.05,
-      scaleY: 1.05,
-      duration: 800,
+      targets: hint,
+      alpha: 0.3,
+      duration: 1200,
       yoyo: true,
       repeat: -1,
-      ease: 'Sine.easeInOut',
-      delay: 1500,
+      delay: 1600,
     });
   }
 
   startGame() {
     this.input.enabled = false;
-    
     eventBus.emit(Events.MUSIC_STOP);
     
-    this.cameras.main.zoomTo(1.2, 300);
+    this.cameras.main.flash(200, 255, 255, 255);
     this.cameras.main.fadeOut(300, 0, 0, 0);
     
     this.cameras.main.once('camerafadeoutcomplete', () => {
