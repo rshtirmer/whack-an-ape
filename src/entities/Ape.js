@@ -20,9 +20,9 @@ export class Ape {
     // Use loaded image textures
     const texKey = isGolden ? 'ape-golden-img' : 'ape-normal-img';
     
-    // Create sprite - scale down from 500x500 to fit holes (~80px)
+    // Create sprite - scale for mobile-friendly hitboxes (~120px)
     this.sprite = scene.add.sprite(this.x, this.y + 60, texKey);
-    this.sprite.setScale(0.16); // 500 * 0.16 = 80px
+    this.sprite.setScale(0.24); // 500 * 0.24 = 120px - bigger for easier tapping
     this.sprite.setDepth(10);
     this.sprite.setInteractive({ useHandCursor: true });
     
@@ -38,7 +38,7 @@ export class Ape {
     }
     
     // Start hidden, then pop up
-    this.sprite.setScale(0.16, 0);
+    this.sprite.setScale(0.24, 0);
     this.popUp();
   }
 
@@ -79,7 +79,7 @@ export class Ape {
   popUp() {
     this.scene.tweens.add({
       targets: this.sprite,
-      scaleY: 0.16,
+      scaleY: 0.24,
       y: this.y - 10,
       duration: APE.POP_UP_DURATION,
       ease: 'Back.easeOut',
@@ -169,8 +169,8 @@ export class Ape {
     // Visual feedback - squash and flash
     this.scene.tweens.add({
       targets: this.sprite,
-      scaleX: 0.2,
-      scaleY: 0.1,
+      scaleX: 0.30,
+      scaleY: 0.15,
       duration: 80,
       yoyo: true,
       onComplete: () => {
